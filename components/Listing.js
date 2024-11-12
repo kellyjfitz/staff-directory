@@ -1,22 +1,13 @@
 import { Text, View, StyleSheet} from 'react-native';
+import styles, {colours} from '../styles.js';
 
 
 const Listing = props => {
   return (
     <View>
-      <Text>{props.name}</Text>
+      <Head>{props.name}</Head>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-
-  subtitle: {
-    fontSize:24,
-    color:'#262626',
-    textAlign:'center',
-    marginVertical:20,
-  }
-});
 
 export default Listing

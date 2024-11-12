@@ -1,5 +1,6 @@
 import { Text, View, StyleSheet} from 'react-native';
 import Button from './Button'
+import styles, {colours} from '../styles.js';
 
 
 const FourLetterRow = props => {
@@ -12,14 +13,5 @@ const FourLetterRow = props => {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-
-  row: {
-    flexDirection:'row',
-    justifyContent:'space-evenly'
-  }
-});
-
 
 export default FourLetterRow

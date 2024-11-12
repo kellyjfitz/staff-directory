@@ -2,12 +2,13 @@ import { Text, View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'rea
 import Head from '../components/Head'
 import Button from '../components/Button'
 import InputWithLabel from '../components/InputWithLabel'
+import styles, {colours} from '../styles.js';
 
 const AddEntry = () => {
   return (
     <ScrollView>
-      <View>
-        <Head head='Add New Directory Entry'/>
+      <View style={styles.screen}>
+        <Head head='Add New Entry'/>
         <InputWithLabel label='First name' placeholder='Enter first name' />
         <InputWithLabel label='Surname' placeholder='Enter surname' />
         <InputWithLabel label='Department' placeholder='Enter department' />

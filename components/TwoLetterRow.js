@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet} from 'react-native';
 import Button from './Button'
-
+import styles, {colours} from '../styles.js';
 
 const TwoLetterRow = props => {
   return (
@@ -13,14 +13,5 @@ const TwoLetterRow = props => {
 
   );
 }
-
-const styles = StyleSheet.create({
-
-  row: {
-    flexDirection:'row',
-    justifyContent:'space-evenly'
-  }
-});
-
 
 export default TwoLetterRow
