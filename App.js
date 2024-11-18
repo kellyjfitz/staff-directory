@@ -1,4 +1,3 @@
-// Only import react-native-gesture-handler on native platforms
 import 'react-native-gesture-handler';
 import styles, { colours } from './styles.js';
 import { StatusBar } from 'expo-status-bar';
@@ -12,26 +11,42 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Drawer = createDrawerNavigator();
 
+const BIN_ID = '6735c48ae41b4d34e454373b'; // Replace with your actual bin ID
+const JSONBIN_API_KEY = '$2a$10$JuHnKf.O/QJvIOo7CNaDdORDHkzK9t6EKgw6vtXKRFBsNg0gcKcdu'; // Replace with your JSONBin API key
+
 function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Attempt to fetch data from the API
-        const response = await axios.get('http://10.0.2.2:3000/api/staff');
-        const data = response.data;
-        console.log('Fetched staff data:', data);
+        // Clear old data (optional, only if you want to reset storage)
+        await AsyncStorage.removeItem('staffData');
+        await AsyncStorage.removeItem('departments');
 
-        // Store the data locally
-        await AsyncStorage.setItem('staffData', JSON.stringify(data));
+        // Attempt to load data from local storage
+        const localStaffData = await AsyncStorage.getItem('staffData');
+        const localDeptData = await AsyncStorage.getItem('departments');
 
-        // You can also fetch departments and store them similarly
-        const deptResponse = await axios.get('http://10.0.2.2:3000/api/departments');
+        if (localStaffData && localDeptData) {
+          console.log('Loaded local staff data:', JSON.parse(localStaffData));
+          console.log('Loaded local departments data:', JSON.parse(localDeptData));
+        } else {
+          // Fetch data from JSONBin if local data is not available
+          const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: {
+              'X-Master-Key': JSONBIN_API_KEY,
+            },
+          });
+          const data = response.data.record.staffData;
+          const deptData = response.data.record.departments;
+          console.log('Fetched staff data:', data);
+          console.log('Fetched departments data:', deptData);
 
-        const deptData = deptResponse.data; console.log('Fetched departments data:', deptData);
-
-        await AsyncStorage.setItem('departments', JSON.stringify(deptResponse.data));
+          // Store the data locally
+          await AsyncStorage.setItem('staffData', JSON.stringify(data));
+          await AsyncStorage.setItem('departments', JSON.stringify(deptData));
+        }
       } catch (error) {
-        console.error('Error fetching data from API:', error);
+        console.error('Error loading data:', error);
       }
     };
 

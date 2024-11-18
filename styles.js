@@ -73,6 +73,20 @@ const styles = StyleSheet.create ({
         backgroundColor:colours.lightGrey,
         padding: '10%'
     },
+    listing: {
+      flex:1,
+      justifyContent: 'center',
+    },
+    listingHead:{
+      textAlign:'center',
+      fontWeight:'bold',
+      fontSize:20,
+      marginTop:30,
+    },
+    listingBody: {
+      textAlign:'center',
+      fontSize:18,
+    },
     row: {
         flexDirection:'row',
         justifyContent:'space-evenly'

@@ -14,7 +14,7 @@ const HomeScreen = ({navigation}) => {
       <View style={{marginTop:25}}>
         <Head head='HR Only'/>
         <Button text='Login'
-        onPress={() => navigation.navigate('HR')}/>
+        onPress={() => navigation.navigate('HR', {screen:'HRLogin'})}/>
       </View>
     </View>
   );
