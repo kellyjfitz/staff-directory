@@ -11,7 +11,8 @@ const Stack = createStackNavigator();
 
 const StackNav = () => (
   <Stack.Navigator
-    screenOptions={({ navigation }) => ({
+      initialRouteName="HRLogin"  
+      screenOptions={({ navigation }) => ({
       headerShown: true,
       headerTitle: () => <Logo />,
       headerTitleAlign: 'center',

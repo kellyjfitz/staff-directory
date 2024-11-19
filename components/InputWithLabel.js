@@ -9,7 +9,7 @@ const InputWithLabel = props => {
       <TextInput style={styles.input} placeholder={props.placeholder}
       placeholderTextColor={colours.midGrey}
       onChangeText={props.onChangeText}
-      text={props.text}
+      value={props.value}
         />
     </View>
   );

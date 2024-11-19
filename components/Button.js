@@ -3,7 +3,7 @@ import styles, {colours} from '../styles.js';
 
 const Button = props => {
   return (
-    <Pressable style={[styles.button, { width: props.width || '100%' }]}
+    <Pressable style={[styles.button, { width: props.width || '100%' }, props.style]}
     onPress={props.onPress}
     >
       <Text style={styles.btnText}>{props.text}</Text>

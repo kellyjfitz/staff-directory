@@ -33,7 +33,6 @@ const organizeData = (data) => {
   return items;
 };
 
-
 const Browse = ({ navigation }) => {
   const [data, setData] = useState([]);
   const flatListRef = useRef(null);
@@ -64,17 +63,17 @@ const Browse = ({ navigation }) => {
       );
     }
 
-  return (
-  <TouchableOpacity onPress={() => navigation.navigate('HR', { 
-    screen: 'StaffListing',
-    params: {item }
-    })}> 
-    <View style={listStyles.item}> 
-      <Text style={listStyles.name}>{item.Surname}, {item.FirstName}</Text> 
-      </View> 
-      </TouchableOpacity> 
+    return (
+      <TouchableOpacity onPress={() => navigation.navigate('HR', {
+        screen: 'StaffListing',
+        params: { item } // Make sure 'item' is correctly passed
+      })}>
+        <View style={listStyles.item}>
+          <Text style={listStyles.name}>{item.Surname}, {item.FirstName}</Text>
+        </View>
+      </TouchableOpacity>
     );
-  };  
+  };
 
   const renderFlatListHeader = () => (
     <View>
@@ -99,15 +98,15 @@ const Browse = ({ navigation }) => {
 
 const listStyles = StyleSheet.create({
   sectionHeader: {
-    backgroundColor:colours.midGrey,
+    backgroundColor: colours.midGrey,
     padding: 10,
-    marginTop:20,
+    marginTop: 20,
   },
   sectionHeaderText: {
-    fontSize:20,
-    fontWeight:'bold',
+    fontSize: 20,
+    fontWeight: 'bold',
     color: colours.white,
-    textAlign:'center',
+    textAlign: 'center',
   },
   item: {
     padding: 10,

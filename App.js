@@ -8,45 +8,46 @@ import DrawerNav from './components/DrawerNav';
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {BIN_ID, JSONBIN_API_KEY} from './config.js'
 
 const Drawer = createDrawerNavigator();
-
-const BIN_ID = '6735c48ae41b4d34e454373b'; // Replace with your actual bin ID
-const JSONBIN_API_KEY = '$2a$10$JuHnKf.O/QJvIOo7CNaDdORDHkzK9t6EKgw6vtXKRFBsNg0gcKcdu'; // Replace with your JSONBin API key
 
 function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Clear old data (optional, only if you want to reset storage)
-        await AsyncStorage.removeItem('staffData');
-        await AsyncStorage.removeItem('departments');
-
-        // Attempt to load data from local storage
-        const localStaffData = await AsyncStorage.getItem('staffData');
-        const localDeptData = await AsyncStorage.getItem('departments');
-
-        if (localStaffData && localDeptData) {
-          console.log('Loaded local staff data:', JSON.parse(localStaffData));
-          console.log('Loaded local departments data:', JSON.parse(localDeptData));
-        } else {
-          // Fetch data from JSONBin if local data is not available
+        // Attempt to fetch data from JSONBin
+      //COMMENTED THIS OUT TO PREVENT NEW REQUESTS WHILE DEVELOPING
           const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: {
-              'X-Master-Key': JSONBIN_API_KEY,
-            },
-          });
-          const data = response.data.record.staffData;
-          const deptData = response.data.record.departments;
-          console.log('Fetched staff data:', data);
-          console.log('Fetched departments data:', deptData);
+          headers: {
+            'X-Master-Key': JSONBIN_API_KEY,
+          },
+        });
+        const data = response.data.record.staffData;
+        const deptData = response.data.record.departments;
+        console.log('Fetched staff data:', data);
+        console.log('Fetched departments data:', deptData);
 
-          // Store the data locally
-          await AsyncStorage.setItem('staffData', JSON.stringify(data));
-          await AsyncStorage.setItem('departments', JSON.stringify(deptData));
-        }
+        // Store the data locally
+        await AsyncStorage.setItem('staffData', JSON.stringify(data));
+        await AsyncStorage.setItem('departments', JSON.stringify(deptData));
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error fetching data from JSONBin:', error);
+
+        //Attempt to load data from local storage if fetching from JSONBin fails
+        try {
+          const localStaffData = await AsyncStorage.getItem('staffData');
+          const localDeptData = await AsyncStorage.getItem('departments');
+
+          if (localStaffData && localDeptData) {
+            console.log('Loaded local staff data:', JSON.parse(localStaffData));
+            console.log('Loaded local departments data:', JSON.parse(localDeptData));
+          } else {
+            console.error('No local data available.');
+          }
+        } catch (localError) {
+          console.error('Error loading local data:', localError);
+        }
       }
     };
 

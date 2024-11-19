@@ -1,84 +1,91 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import Head from '../components/Head';
 import Button from '../components/Button';
-import React, { useEffect, useState, useRef } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import styles, {colours} from '../styles.js';
+import React, { useEffect, useState, useCallback } from 'react';
+import styles, { colours } from '../styles.js';
+import axios from 'axios';
+import { BIN_ID, JSONBIN_API_KEY } from '../config';
+import { useFocusEffect } from '@react-navigation/native';
 
+const ListingHead = ({ children }) => {
+  return <Text style={styles.listingHead}>{children}</Text>;
+};
 
-const ListingHead = ({children}) => {
-  return (
-      <Text style={styles.listingHead}>{children}</Text>
-  );
-}
-const ListingText = ({children}) => {
-  return (
-      <Text style={styles.listingBody}>{children}</Text>
-  );
-}
+const ListingText = ({ children }) => {
+  return <Text style={styles.listingBody}>{children}</Text>;
+};
 
-
-
-const StaffListing = ({route, navigation}) => {
- 
-  const {item} = route.params;
-
-    // 1. State variables to store departments and selected department name
-  const [departments, setDepartments] = useState([]);
+const StaffListing = ({ route, navigation }) => {
+  const { item } = route.params;
+  const [staff, setStaff] = useState(item);
   const [departmentName, setDepartmentName] = useState('');
 
-  // 2. useEffect to load departments from AsyncStorage
-  useEffect(() => {
-    const loadDepartments = async () => {
-      try {
-        const storedDepartments = await AsyncStorage.getItem('departments');
-        if (storedDepartments) {
-          const parsedDepartments = JSON.parse(storedDepartments);
-          setDepartments(parsedDepartments);
+  const fetchData = async () => {
+    try {
+      console.log('Fetching data...'); // Debug log
 
-          // 3. Find the matching department
-          const matchingDepartment = parsedDepartments.find(dept => dept.Id === item.Department);
-          if (matchingDepartment) {
-            // 4. Set the department name
-            setDepartmentName(matchingDepartment.Name);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading departments:', error);
+      const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        headers: {
+          'X-Master-Key': JSONBIN_API_KEY,
+        },
+      });
+
+      const data = response.data.record;
+      const staffData = data.staffData;
+      const departmentsData = data.departments;
+
+      const matchingStaff = staffData.find(staffMember => staffMember.Id === item.Id);
+      if (matchingStaff) {
+        setStaff(matchingStaff);
       }
-    };
 
-    loadDepartments();
-  }, [item.Department]); // Ensure this effect runs when item.Department changes
+      const matchingDepartment = departmentsData.find(dept => dept.Id === matchingStaff.Department);
+      if (matchingDepartment) {
+        setDepartmentName(matchingDepartment.Name);
+      }
+    } catch (error) {
+      console.error('Unable to fetch data from the API. Device might be offline.', error);
+    }
+  };
 
-    return (
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [item.Id]) // Dependency array includes item.Id
+  );
+
+  return (
     <View style={styles.screen}>
       <View style={styles.listing}>
-        <Head head={`${item.Surname}, ${item.FirstName}`}/>
+        <Head head={`${staff.Surname}, ${staff.FirstName}`} />
         <View>
           <ListingHead>Department:</ListingHead>
           <ListingText>{departmentName}</ListingText>
         </View>
         <View>
           <ListingHead>Address:</ListingHead>
-          <ListingText>{item.Street}</ListingText>
-          <ListingText>{item.City}</ListingText>
-          <ListingText>{item.State}</ListingText>
-          <ListingText>{item.ZIP}</ListingText>
-          <ListingText>{item.Country}</ListingText>
+          <ListingText>{staff.Street}</ListingText>
+          <ListingText>{staff.City}</ListingText>
+          <ListingText>{staff.State}</ListingText>
+          <ListingText>{staff.ZIP}</ListingText>
+          <ListingText>{staff.Country}</ListingText>
         </View>
         <View>
           <ListingHead>Phone:</ListingHead>
-          <ListingText>{item.Phone}</ListingText>
+          <ListingText>{staff.Phone}</ListingText>
         </View>
       </View>
-      <Button text="Edit" 
-        onPress={() => navigation.navigate('HR', { 
-        screen: 'EditEntry',
-        params: {item }
-        })}/>
+      <Button
+        text="Edit"
+        onPress={() =>
+          navigation.navigate('HR', {
+            screen: 'EditEntry',
+            params: { item: staff },
+          })
+        }
+      />
     </View>
   );
-}
+};
 
 export default StaffListing;
