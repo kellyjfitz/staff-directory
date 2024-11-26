@@ -91,7 +91,7 @@ const AddEntry = ({ navigation }) => {
       if (updateResponse.status === 200) {
         console.log('New entry added successfully');
         showAlert("Success", "New entry added");
-        navigation.goBack(); 
+        navigation.navigate('Browse');
       }
     } catch (error) {
       console.error('Error adding new entry:', error);
