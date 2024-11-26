@@ -1,12 +1,13 @@
-import { Text, View, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, ScrollView} from 'react-native';
 import Head from '../components/Head';
 import Button from '../components/Button';
 import InputWithLabel from '../components/InputWithLabel';
-import styles, { colours } from '../styles.js';
+import styles from '../styles.js';
 import React, { useState } from 'react';
 import axios from 'axios'; // Import axios for making API calls
 import { BIN_ID, JSONBIN_API_KEY } from '../config'; // Import the config
 import DepartmentDropDown from '../components/DepartmentDropDown.js';
+import showAlert from '../components/Alert.js';
 
 const AddEntry = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -29,6 +30,8 @@ const AddEntry = ({ navigation }) => {
       !state || !zip || !country || !department
     ) {
       console.log('All fields must be filled out before saving.');
+      showAlert("Problem", "You must fill out all fields");
+      
       return false;
     }
     return true;
@@ -87,16 +90,18 @@ const AddEntry = ({ navigation }) => {
 
       if (updateResponse.status === 200) {
         console.log('New entry added successfully');
-        navigation.goBack(); // Navigate back or provide feedback to the user
+        showAlert("Success", "New entry added");
+        navigation.goBack(); 
       }
     } catch (error) {
       console.error('Error adding new entry:', error);
-      // Handle error (e.g., show an error message to the user)
+      showAlert("Error", "There was a problem and the entry was not created.");
+     
     }
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.screen}>
         <Head head='Add New Entry' />
         <InputWithLabel label='First name' placeholder='Enter first name' value={firstName} onChangeText={text => setFirstName(text)} />

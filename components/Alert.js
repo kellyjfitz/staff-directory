@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Button, Alert, StyleSheet } from 'react-native';
+import { Alert} from 'react-native';
 
 const showAlert = (title, message) => {
     Alert.alert(

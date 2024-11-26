@@ -1,36 +1,23 @@
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Text, View } from 'react-native';
 import Head from '../components/Head';
 import Button from '../components/Button';
-import React, { useEffect, useState, useCallback } from 'react';
 import styles, { colours } from '../styles.js';
-import axios from 'axios';
-import { BIN_ID, JSONBIN_API_KEY } from '../config';
 import { useFocusEffect } from '@react-navigation/native';
+import { fetchDataFromAPI, deleteStaffMember } from '../components/ApiHelpers';
 
-const ListingHead = ({ children }) => {
-  return <Text style={styles.listingHead}>{children}</Text>;
-};
-
-const ListingText = ({ children }) => {
-  return <Text style={styles.listingBody}>{children}</Text>;
-};
+const ListingHead = ({ children }) => <Text style={styles.listingHead}>{children}</Text>;
+const ListingText = ({ children }) => <Text style={styles.listingBody}>{children}</Text>;
 
 const StaffListing = ({ route, navigation }) => {
   const { item } = route.params;
   const [staff, setStaff] = useState(item);
   const [departmentName, setDepartmentName] = useState('');
 
-  const fetchData = async () => {
+  const fetchStaffData = async () => {
     try {
-      console.log('Fetching data...'); // Debug log
-
-      const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: {
-          'X-Master-Key': JSONBIN_API_KEY,
-        },
-      });
-
-      const data = response.data.record;
+      console.log('Fetching data...');
+      const data = await fetchDataFromAPI();
       const staffData = data.staffData;
       const departmentsData = data.departments;
 
@@ -44,14 +31,14 @@ const StaffListing = ({ route, navigation }) => {
         setDepartmentName(matchingDepartment.Name);
       }
     } catch (error) {
-      console.error('Unable to fetch data from the API. Device might be offline.', error);
+      console.error('An error occurred while fetching data:', error);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      fetchData();
-    }, [item.Id]) // Dependency array includes item.Id
+      fetchStaffData();
+    }, [item.Id])
   );
 
   return (
@@ -77,12 +64,14 @@ const StaffListing = ({ route, navigation }) => {
       </View>
       <Button
         text="Edit"
-        onPress={() =>
-          navigation.navigate('HR', {
-            screen: 'EditEntry',
-            params: { item: staff },
-          })
-        }
+        onPress={() => navigation.navigate('EditEntry', { item: staff })}
+      />
+      <Button
+        text="Delete"
+        onPress={async () => {
+          await deleteStaffMember(staff.Id, staff.FirstName, staff.Surname);
+          navigation.navigate('Home');
+        }}
       />
     </View>
   );

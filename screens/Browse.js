@@ -1,36 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { TouchableOpacity, View, Text, FlatList, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import Head from '../components/Head';
 import Subtitle from '../components/Subtitle';
-import styles, { colours } from '../styles.js';
+import styles from '../styles.js';
+import { BIN_ID, JSONBIN_API_KEY } from '../config';
 
-const organizeData = (data) => {
-  const itemsMap = new Map();
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-
-  // Initialize the map with empty arrays for each letter
-  alphabet.forEach((letter) => {
-    itemsMap.set(letter, []);
-  });
-
-  // Populate the map with data items
-  data.forEach((item) => {
-    const surname = item.Surname;
-    const initial = surname ? surname[0].toUpperCase() : '';
-    if (itemsMap.has(initial)) {
-      itemsMap.get(initial).push({ type: 'item', ...item, key: `item-${item.Id}` });
-    }
-  });
-
-  // Convert the map to the desired format
-  const items = [];
-  itemsMap.forEach((value, key) => {
-    items.push({ type: 'header', letter: key, key: `header-${key}` });
-    items.push(...value);
-  });
-
-  return items;
+const fetchDataFromAPI = async () => {
+  try {
+    const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_API_KEY,
+      },
+    });
+    return response.data.record;
+  } catch (error) {
+    console.error('Unable to fetch data from the API. Device might be offline.', error);
+    throw error;
+  }
 };
 
 const Browse = ({ navigation }) => {
@@ -38,47 +26,36 @@ const Browse = ({ navigation }) => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    const loadStoredData = async () => {
+    const loadAndStoreData = async () => {
       try {
-        const storedData = await AsyncStorage.getItem('staffData');
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          const organizedData = organizeData(parsedData);
-          setData(organizedData);
+        const apiData = await fetchDataFromAPI();
+        if (apiData) {
+          // Sort the staff data alphabetically by surname
+          const sortedData = apiData.staffData.sort((a, b) => a.Surname.localeCompare(b.Surname));
+          await AsyncStorage.setItem('staffData', JSON.stringify(apiData));
+          setData(sortedData); // Set the sorted data
         }
       } catch (error) {
-        console.error('Error loading stored data:', error);
+        console.error('Error loading data from API and storing in local storage:', error);
       }
     };
 
-    loadStoredData();
+    loadAndStoreData();
   }, []);
 
-  const renderItem = ({ item }) => {
-    if (item.type === 'header') {
-      return (
-        <View style={listStyles.sectionHeader}>
-          <Text style={listStyles.sectionHeaderText}>{item.letter}</Text>
-        </View>
-      );
-    }
-
-    return (
-      <TouchableOpacity onPress={() => navigation.navigate('HR', {
-        screen: 'StaffListing',
-        params: { item } // Make sure 'item' is correctly passed
-      })}>
-        <View style={listStyles.item}>
-          <Text style={listStyles.name}>{item.Surname}, {item.FirstName}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate('StaffListing', { item })}>
+      <View style={styles.directoryItem}>
+        <Text style={styles.directoryName}>{item.Surname}, {item.FirstName}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   const renderFlatListHeader = () => (
     <View>
       <Head head='Browse Staff Directory' />
-      <Subtitle text='Listings are sorted alphabetically by surname' />
+      <Subtitle text='Listings are sorted alphabetically by surname.
+      Click on a name to see full details.' />
     </View>
   );
 
@@ -89,34 +66,11 @@ const Browse = ({ navigation }) => {
         data={data}
         ListHeaderComponent={renderFlatListHeader}
         renderItem={renderItem}
-        keyExtractor={item => item.key}
+        keyExtractor={item => `item-${item.Id}`}
         contentContainerStyle={{ flexGrow: 1 }}
       />
     </View>
   );
 };
-
-const listStyles = StyleSheet.create({
-  sectionHeader: {
-    backgroundColor: colours.midGrey,
-    padding: 10,
-    marginTop: 20,
-  },
-  sectionHeaderText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colours.white,
-    textAlign: 'center',
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default Browse;

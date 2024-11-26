@@ -2,11 +2,11 @@ import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text } from 'react-native';
-import styles, { colours } from '../styles.js';
+import styles from '../styles.js';
 
 const DepartmentDropDown = ({ initialDepartment, onDepartmentChange }) => {
   const [departments, setDepartments] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState((initialDepartment + 1) || '');
+  const [selectedDepartment, setSelectedDepartment] = useState(initialDepartment ? initialDepartment + 1 : '');
 
   useEffect(() => {
     const loadDepartments = async () => {
@@ -14,9 +14,10 @@ const DepartmentDropDown = ({ initialDepartment, onDepartmentChange }) => {
         const storedDepartments = await AsyncStorage.getItem('departments');
         if (storedDepartments) {
           const parsedDepartments = JSON.parse(storedDepartments);
+          console.log('Loaded departments:', parsedDepartments); // Log loaded departments
           setDepartments(parsedDepartments);
-          
         }
+        else { console.log('No departments found in AsyncStorage.'); }
       } catch (error) {
         console.error('Error loading departments:', error);
       }
@@ -43,15 +44,14 @@ const DepartmentDropDown = ({ initialDepartment, onDepartmentChange }) => {
   return (
     <View style={styles.labelContainer}>
       <Text style={styles.label}>Department</Text>
-      <View style={[styles.input, { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 0 }]}>
+      <View style={styles.pickerContainer}>
         <Picker
           style={{ flex: 1 }}
           selectedValue={selectedDepartment}
           onValueChange={handleValueChange}
         >
-          
           {departmentOptions.map(option => (
-            <Picker.Item label={option.label} value={option.value} key={option.value} style={{ fontSize: 14, marginLeft: 0, textAlign: 'left' }} />
+            <Picker.Item label={option.label} value={option.value} key={option.value} style={styles.picker} />
           ))}
         </Picker>
       </View>

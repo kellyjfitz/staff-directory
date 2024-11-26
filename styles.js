@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: colours.lightGrey,
   },
   head: {
-    fontSize: 30, // Fixed value for testing
+    fontSize: 40, 
     fontWeight: '900',
     color: colours.red,
     textAlign: 'center',
@@ -32,30 +32,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   btnText: {
-    fontSize: 20, // Fixed value for testing
+    fontSize: 20, 
     fontWeight: 'bold',
     color: colours.white,
     textAlign: 'center',
-  },
-  drawerStyle: {
-    backgroundColor: colours.red,
-    width: '75%',
-  },
-  navLogo: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '80%',
-  },
-  logo: {
-    margin: 17.5,
-    width: 35,
-    height: 35,
-  },
-  drawerLabelStyle: {
-    color: 'white',
-    fontSize: 20, // Fixed value for testing
   },
   headerStyle: {
     backgroundColor: colours.lightGrey,
@@ -64,7 +44,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: colours.lightGrey,
-    padding: '10%',
+    paddingHorizontal: '10%',
+    paddingBottom:'10%'
   },
   listing: {
     flex: 1,
@@ -73,19 +54,25 @@ const styles = StyleSheet.create({
   listingHead: {
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 20, // Fixed value for testing
+    fontSize: 20, 
     marginTop: 30,
   },
   listingBody: {
     textAlign: 'center',
-    fontSize: 18, // Fixed value for testing
+    fontSize: 18, 
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+  directoryItem: {
+    padding: 10,
   },
+  directoryName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign:'center',
+    color: colours.charcoal
+  },
+
   subtitle: {
-    fontSize: 24, // Fixed value for testing
+    fontSize: 24, 
     color: colours.charcoal,
     textAlign: 'center',
     marginVertical: 10,
@@ -94,7 +81,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   label: {
-    fontSize: 18, // Fixed value for testing
+    fontSize: 18, 
     marginBottom: 10,
     paddingLeft: 5,
   },
@@ -104,8 +91,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 10,
     borderRadius: 10,
-    fontSize: 14, // Fixed value for testing
+    fontSize: 16, 
   },
+  picker: {
+    fontSize: 16, 
+    marginLeft: 0, 
+    textAlign: 'left'
+  },
+  pickerContainer: {
+    height: 40,
+    borderColor: colours.grey,
+    borderWidth: 1,
+    borderRadius: 10,
+    fontSize: 14, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'flex-start'
+  },
+  scrollContainer: {
+    paddingBottom:20,
+  }
 });
 
 export default styles;

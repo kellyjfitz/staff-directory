@@ -1,5 +1,5 @@
-import { Text, View, StyleSheet} from 'react-native';
-import styles, {colours} from '../styles.js';
+import { Text} from 'react-native';
+import styles from '../styles.js';
 
 
 const Subtitle = props => {
