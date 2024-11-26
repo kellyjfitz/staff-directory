@@ -1,34 +1,18 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
+import styles, {colours} from '../styles.js';
 
 const InputWithLabel = props => {
   return (
-    <View style={styles.container}>
+    <View style={styles.labelContainer}>
       <Text style={styles.label}>{props.label}</Text>
       <TextInput style={styles.input} placeholder={props.placeholder}
-      placeholderTextColor="grey"
+      placeholderTextColor={colours.midGrey}
+      onChangeText={props.onChangeText}
+      value={props.value}
         />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    paddingLeft:5,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingLeft: 10,
-    borderRadius:10,
-  },
-
-});
 
 export default InputWithLabel;

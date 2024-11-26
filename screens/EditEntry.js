@@ -1,49 +1,34 @@
-import { View, ScrollView} from 'react-native';
+import { Text, View, ScrollView } from 'react-native';
 import Head from '../components/Head';
 import Button from '../components/Button';
 import InputWithLabel from '../components/InputWithLabel';
 import styles from '../styles.js';
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for making API calls
-import { BIN_ID, JSONBIN_API_KEY } from '../config'; // Import the config
 import DepartmentDropDown from '../components/DepartmentDropDown.js';
+import axios from 'axios';
+import { BIN_ID, JSONBIN_API_KEY } from '../config';
 import showAlert from '../components/Alert.js';
 
-const AddEntry = ({ navigation }) => {
-  const [firstName, setFirstName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [phone, setPhone] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [zip, setZip] = useState('');
-  const [country, setCountry] = useState('');
-  const [department, setDepartment] = useState('');
+const EditEntry = ({ route, navigation }) => {
+  const { item } = route.params;
+  const [id, setId] = useState(item.Id);
+  const [firstName, setFirstName] = useState(item.FirstName);
+  const [surname, setSurname] = useState(item.Surname);
+  const [phone, setPhone] = useState(item.Phone);
+  const [street, setStreet] = useState(item.Street);
+  const [city, setCity] = useState(item.City);
+  const [state, setState] = useState(item.State);
+  const [zip, setZip] = useState(item.ZIP);
+  const [country, setCountry] = useState(item.Country);
+  const [department, setDepartment] = useState(item.Department);
+
 
   const handleDepartmentChange = (newDepartment) => {
     setDepartment(newDepartment);
   };
 
-  const validateFields = () => {
-    if (
-      !firstName || !surname || !phone || !street || !city || 
-      !state || !zip || !country || !department
-    ) {
-      console.log('All fields must be filled out before saving.');
-      showAlert("Problem", "You must fill out all fields");
-      
-      return false;
-    }
-    return true;
-  };
-
   const handleSave = async () => {
-    if (!validateFields()) {
-      return;
-    }
-
     try {
-      // Fetch current data from the JSON bin
       const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
         headers: {
           'X-Master-Key': JSONBIN_API_KEY,
@@ -53,34 +38,29 @@ const AddEntry = ({ navigation }) => {
       const currentData = response.data.record;
       const staffData = currentData.staffData;
 
-      // Determine the highest ID and increment by 1
-      const highestId = Math.max(...staffData.map(staff => staff.Id));
-      const newId = highestId + 1;
+      const updatedStaffData = staffData.map((staff) => {
+        if (staff.Id === id) {
+          return {
+            ...staff,
+            FirstName: firstName,
+            Surname: surname,
+            Phone: phone,
+            Street: street,
+            City: city,
+            State: state,
+            ZIP: zip,
+            Country: country,
+            Department: department,
+          };
+        }
+        return staff;
+      });
 
-      // Create the new staff entry
-      const newStaffEntry = {
-        Id: newId,
-        FirstName: firstName,
-        Surname: surname,
-        Phone: phone,
-        Street: street,
-        City: city,
-        State: state,
-        ZIP: zip,
-        Country: country,
-        Department: department,
-      };
-
-      // Add the new entry to the staff data
-      const updatedStaffData = [...staffData, newStaffEntry];
-
-      // Prepare the updated data
       const updatedData = {
         ...currentData,
         staffData: updatedStaffData,
       };
 
-      // Send the updated data back to the JSON bin
       const updateResponse = await axios.put(`https://api.jsonbin.io/v3/b/${BIN_ID}`, updatedData, {
         headers: {
           'Content-Type': 'application/json',
@@ -89,22 +69,21 @@ const AddEntry = ({ navigation }) => {
       });
 
       if (updateResponse.status === 200) {
-        console.log('New entry added successfully');
-        showAlert("Success", "New entry added");
-        navigation.goBack(); 
+        console.log('Entry updated successfully');
+        showAlert("Success", "Entry updated");
+        navigation.goBack();
       }
     } catch (error) {
-      console.error('Error adding new entry:', error);
-      showAlert("Error", "There was a problem and the entry was not created.");
-     
+      console.error('Error updating entry:', error);
+      showAlert("Error", "There was a problem and the entry hasn't updated");
     }
   };
 
   return (
     <ScrollView style={styles.scrollContainer}>
       <View style={styles.screen}>
-        <Head head='Add New Entry' />
-        <InputWithLabel label='First name' placeholder='Enter first name' value={firstName} onChangeText={text => setFirstName(text)} />
+        <Head head='Edit Entry' />
+        <InputWithLabel label='First name' value={firstName} onChangeText={text => setFirstName(text)} />
         <InputWithLabel label='Surname' placeholder='Enter surname' value={surname} onChangeText={text => setSurname(text)} />
         <DepartmentDropDown
           initialDepartment={department}
@@ -123,4 +102,4 @@ const AddEntry = ({ navigation }) => {
   );
 };
 
-export default AddEntry;
+export default EditEntry;

@@ -1,9 +1,9 @@
-import { Text, View, StyleSheet, Image, Pressable } from 'react-native';
-
+import { Text, Pressable } from 'react-native';
+import styles from '../styles.js';
 
 const Button = props => {
   return (
-    <Pressable style={[styles.button, { width: props.width || '75%' }]}
+    <Pressable style={[styles.button, { width: props.width || '100%' }, props.style]}
     onPress={props.onPress}
     >
       <Text style={styles.btnText}>{props.text}</Text>
@@ -11,21 +11,4 @@ const Button = props => {
   );
 }
 
-const styles = StyleSheet.create({
-
-button: {
-  backgroundColor:'#3B3B3B',
-  borderRadius:10,
-  padding: 10,
-  marginTop:10,
-  marginBottom:10,
-  alignSelf: 'center'
-},
-btnText: {
-  fontSize:20,
-  fontWeight:'bold',
-  color:'#ffffff',
-  textAlign:'center',
-}
-});
 export default Button

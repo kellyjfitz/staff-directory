@@ -1,29 +1,76 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import Head from '../components/Head'
-import Subtitle from '../components/Subtitle'
-import Button from '../components/Button'
-import FourLetterRow from '../components/FourLetterRow'
-import TwoLetterRow from '../components/TwoLetterRow'
+import React, { useEffect, useState, useRef } from 'react';
+import { TouchableOpacity, View, Text, FlatList} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import Head from '../components/Head';
+import Subtitle from '../components/Subtitle';
+import styles from '../styles.js';
+import { BIN_ID, JSONBIN_API_KEY } from '../config';
 
-const Browse = ({navigation}) => {
-  return (
-    <View style={{flex:1, justifyContent: 'space-evenly', backgroundColor:'#F5F5F5'}}>
-        <View>
-        <Head head='Browse Staff Directory'/>
-        <Subtitle text='Click a letter to jump to that section (by surname) or scroll down to browse'/>
-        </View>
-        <View>
-          <FourLetterRow letter1='A' letter2='B' letter3='C' letter4='D' />
-          <FourLetterRow letter1='E' letter2='F' letter3='G' letter4='H' />
-          <FourLetterRow letter1='I' letter2='J' letter3='K' letter4='L' />
-          <FourLetterRow letter1='M' letter2='N' letter3='O' letter4='P' />
-          <FourLetterRow letter1='Q' letter2='R' letter3='S' letter4='T' />
-          <FourLetterRow letter1='U' letter2='V' letter3='W' letter4='X' />
-          <TwoLetterRow letter1='Y' letter2='Z' />
-    </View>
-    </View>
+const fetchDataFromAPI = async () => {
+  try {
+    const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_API_KEY,
+      },
+    });
+    return response.data.record;
+  } catch (error) {
+    console.error('Unable to fetch data from the API. Device might be offline.', error);
+    throw error;
+  }
+};
 
+const Browse = ({ navigation }) => {
+  const [data, setData] = useState([]);
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    const loadAndStoreData = async () => {
+      try {
+        const apiData = await fetchDataFromAPI();
+        if (apiData) {
+          // Sort the staff data alphabetically by surname
+          const sortedData = apiData.staffData.sort((a, b) => a.Surname.localeCompare(b.Surname));
+          await AsyncStorage.setItem('staffData', JSON.stringify(apiData));
+          setData(sortedData); // Set the sorted data
+        }
+      } catch (error) {
+        console.error('Error loading data from API and storing in local storage:', error);
+      }
+    };
+
+    loadAndStoreData();
+  }, []);
+
+  const renderItem = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate('StaffListing', { item })}>
+      <View style={styles.directoryItem}>
+        <Text style={styles.directoryName}>{item.Surname}, {item.FirstName}</Text>
+      </View>
+    </TouchableOpacity>
   );
-}
 
-export default Browse
+  const renderFlatListHeader = () => (
+    <View>
+      <Head head='Browse Staff Directory' />
+      <Subtitle text='Listings are sorted alphabetically by surname.
+      Click on a name to see full details.' />
+    </View>
+  );
+
+  return (
+    <View style={styles.screen}>
+      <FlatList
+        ref={flatListRef}
+        data={data}
+        ListHeaderComponent={renderFlatListHeader}
+        renderItem={renderItem}
+        keyExtractor={item => `item-${item.Id}`}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
+    </View>
+  );
+};
+
+export default Browse;
