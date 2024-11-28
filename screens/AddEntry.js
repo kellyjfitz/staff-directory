@@ -4,8 +4,9 @@ import Button from '../components/Button';
 import InputWithLabel from '../components/InputWithLabel';
 import styles from '../styles.js';
 import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for making API calls
-import { BIN_ID, JSONBIN_API_KEY } from '../config'; // Import the config
+import axios from 'axios'; 
+// This is the bin id and key for accessing the data
+import { BIN_ID, JSONBIN_API_KEY } from '../config'; 
 import DepartmentDropDown from '../components/DepartmentDropDown.js';
 import showAlert from '../components/Alert.js';
 

@@ -6,25 +6,29 @@ import Head from '../components/Head';
 import Subtitle from '../components/Subtitle';
 import styles from '../styles.js';
 import { BIN_ID, JSONBIN_API_KEY } from '../config';
+import { fetchDataFromAPI, fetchDataFromLocal, updateDataInLocal } from '../components/ApiHelpers';
 
-const fetchDataFromAPI = async () => {
-  try {
-    const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-      headers: {
-        'X-Master-Key': JSONBIN_API_KEY,
-      },
-    });
-    return response.data.record;
-  } catch (error) {
-    console.error('Unable to fetch data from the API. Device might be offline.', error);
-    throw error;
-  }
-};
+
+// const fetchDataFromAPI = async () => {
+//   try {
+//     const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+//       headers: {
+//         'X-Master-Key': JSONBIN_API_KEY,
+//       },
+//     });
+//     return response.data.record;
+//   } catch (error) {
+//     console.error('Unable to fetch data from the API. Device might be offline.', error);
+//     throw error;
+//   }
+// };
 
 const Browse = ({ navigation }) => {
   const [data, setData] = useState([]);
   const flatListRef = useRef(null);
 
+
+  
   useEffect(() => {
     const loadAndStoreData = async () => {
       try {

@@ -42,6 +42,38 @@ export const updateDataInLocal = async (data) => {
   }
 };
 
+export const loadData = async () => {
+  try {
+    // Attempt to fetch data from jsonbin
+    const apiData = await fetchDataFromAPI();
+    console.log('Fetched staff data.');
+    console.log('Fetched departments data.');
+  
+    // Store the data locally
+    await updateDataInLocal(apiData);
+  } catch (error) {
+    console.error('Error fetching data from JSONBin:', error);
+
+    // Attempt to load data from local storage if fetching from jsonbin fails
+    try {
+      const localData = await fetchDataFromLocal();
+      const localStaffData = localData.staffData;
+      const localDeptData = localData.departments;
+      
+      //check that there is actually something in the local data
+      if (localStaffData.length && localDeptData.length) {
+        console.log('Loaded local staff data.');
+        console.log('Loaded local departments data.');
+      } else {
+        console.error('No local data available.');
+      }
+    } catch (localError) {
+      console.error('Error loading local data:', localError);
+    }
+  }
+};
+
+
 // Delete a staff member in local storage and update the API
 export const deleteStaffMember = async (staffId, firstName, surname) => {
   try {
