@@ -1,38 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { TouchableOpacity, View, Text, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import Head from '../components/Head';
 import Subtitle from '../components/Subtitle';
 import styles from '../styles.js';
-import { BIN_ID, JSONBIN_API_KEY } from '../config';
-import { fetchDataFromAPI, fetchDataFromLocal, updateDataInLocal } from '../components/ApiHelpers';
+import { loadData } from '../components/ApiHelpers';
 
 
-// const fetchDataFromAPI = async () => {
-//   try {
-//     const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-//       headers: {
-//         'X-Master-Key': JSONBIN_API_KEY,
-//       },
-//     });
-//     return response.data.record;
-//   } catch (error) {
-//     console.error('Unable to fetch data from the API. Device might be offline.', error);
-//     throw error;
-//   }
-// };
 
 const Browse = ({ navigation }) => {
   const [data, setData] = useState([]);
   const flatListRef = useRef(null);
 
-
-  
   useEffect(() => {
     const loadAndStoreData = async () => {
       try {
-        const apiData = await fetchDataFromAPI();
+        const apiData = await loadData();
         if (apiData) {
           // Sort the staff data alphabetically by surname
           const sortedData = apiData.staffData.sort((a, b) => a.Surname.localeCompare(b.Surname));
@@ -40,7 +23,7 @@ const Browse = ({ navigation }) => {
           setData(sortedData); // Set the sorted data
         }
       } catch (error) {
-        console.error('Error loading data from API and storing in local storage:', error);
+        console.error('Error loading and sorting data:', error);
       }
     };
 

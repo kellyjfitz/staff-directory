@@ -9,6 +9,7 @@ import axios from 'axios';
 import { BIN_ID, JSONBIN_API_KEY } from '../config'; 
 import DepartmentDropDown from '../components/DepartmentDropDown.js';
 import showAlert from '../components/Alert.js';
+import { loadData, updateDataInJsonBin } from '../components/ApiHelpers';
 
 const AddEntry = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
@@ -44,15 +45,8 @@ const AddEntry = ({ navigation }) => {
     }
 
     try {
-      // Fetch current data from the JSON bin
-      const response = await axios.get(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-        headers: {
-          'X-Master-Key': JSONBIN_API_KEY,
-        },
-      });
-
-      const currentData = response.data.record;
-      const staffData = currentData.staffData;
+      const data = await loadData();
+      const staffData = data.staffData;
 
       // Determine the highest ID and increment by 1
       const highestId = Math.max(...staffData.map(staff => staff.Id));
@@ -82,12 +76,7 @@ const AddEntry = ({ navigation }) => {
       };
 
       // Send the updated data back to the JSON bin
-      const updateResponse = await axios.put(`https://api.jsonbin.io/v3/b/${BIN_ID}`, updatedData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': JSONBIN_API_KEY,
-        },
-      });
+      const updateResponse = await updateDataInJsonBin(updatedData);
 
       if (updateResponse.status === 200) {
         console.log('New entry added successfully');

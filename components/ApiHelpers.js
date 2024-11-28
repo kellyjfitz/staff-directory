@@ -51,6 +51,9 @@ export const loadData = async () => {
   
     // Store the data locally
     await updateDataInLocal(apiData);
+
+    return apiData;
+
   } catch (error) {
     console.error('Error fetching data from JSONBin:', error);
 
@@ -64,6 +67,7 @@ export const loadData = async () => {
       if (localStaffData.length && localDeptData.length) {
         console.log('Loaded local staff data.');
         console.log('Loaded local departments data.');
+        return localData;
       } else {
         console.error('No local data available.');
       }
@@ -97,5 +101,20 @@ export const deleteStaffMember = async (staffId, firstName, surname) => {
     console.error('An error occurred while deleting staff member locally and updating API:', error);
     showAlert("Problem", `Something went wrong and the entry was not deleted for ${firstName} ${surname}`);
     throw error;
+  }
+}
+
+  export const updateDataInJsonBin = async (updatedData) => { 
+    try { 
+      const response = await axios.put(`https://api.jsonbin.io/v3/b/${BIN_ID}`, updatedData, { 
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-Master-Key': JSONBIN_API_KEY, 
+        }, 
+      }); 
+      return response; 
+    } catch (error) { 
+      console.error('Error updating data in JSONBin:', error); 
+      
   }
 };
